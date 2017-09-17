@@ -1,0 +1,55 @@
+---
+title: "how well they do it"
+author: "Xiaozhuo Wang"
+date: "2017-09-16"
+output: html_document
+---
+
+Background
+
+Using devices such as Jawbone Up, Nike FuelBand, and Fitbit it is now possible to collect a large amount of data about personal activity relatively inexpensively. These type of devices are part of the quantified self movement ¨C a group of enthusiasts who take measurements about themselves regularly to improve their health, to find patterns in their behavior, or because they are tech geeks. One thing that people regularly do is quantify how much of a particular activity they do, but they rarely quantify how well they do it. In this project, we will use data from accelerometers on the belt, forearm, arm, and dumbell of 6 participants, who were asked to perform barbell lifts correctly and incorrectly in 5 different ways. The goal of our project is to predict the manner in which they did the exercise. More information and the data for this project come from this source: http://web.archive.org/web/20161224072740/http:/groupware.les.inf.puc-rio.br/har
+
+
+Data
+
+The training data for this project are available [here](https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv), the test data are available [here](https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv).
+
+
+
+
+
+The manner in which they did the exercise is the "classe" variable in the training set. 
+
+how you built your model
+how you used cross validation
+what you think the expected out of sample error is
+why you made the choices you did
+predict 20 different test cases
+
+
+```{r, echo=FALSE}
+if(!file.exists("pml-training.csv")) {
+        download.file("https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv",
+              "pml-training.csv")}
+if(!file.exists("pml-training.csv")) {
+        download.file("https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv",
+              "pml-testing.csv")}
+pml_training <- read.csv("pml-training.csv")
+pml_testing <- read.csv("pml-testing.csv")
+library(caret)
+```
+
+```{r, echo=FALSE}
+isna <- NULL; for (i in 1:160) {isna[i] = sum(is.na(pml_training[, i])) == 19216}
+suma <- summary(pml_training); isbl <- grepl(":19216",suma[1,])
+iskept <- !(isna|isbl)
+iskept[1:7] <- FALSE
+pre_training <- pml_training[,iskept]
+pre_testing <- pml_testing[,iskept]
+```
+
+```{r, echo=FALSE}
+fitControl <- trainControl(method = "cv", number = 10, allowParallel = TRUE)
+set.seed(2333)
+mod_rf <- train(classe ~ ., data = pre_training, method = "rf", trControl = fitControl)
+```
